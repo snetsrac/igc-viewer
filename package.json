@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "cd client && npm ci && npm run build"
+    "build": "cd client && npm install && npm run build",
+    "start": "gunicorn app:app",
+    "dev:server": "flask run",
+    "dev:client": "cd client && npm run dev",
+    "dev": "npm run dev:server & npm run dev:client"
   }
 }
