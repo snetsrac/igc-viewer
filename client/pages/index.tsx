@@ -1,16 +1,37 @@
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import MapViewer from '../components/MapViewer';
+import { Feature, FeatureCollection } from '@turf/helpers';
+import { MapProvider } from 'react-map-gl';
 
 export default function Home() {
-  const [text, setText] = useState('');
+  // const [text, setText] = useState('');
+  const [featureCollection, setFeatureCollection] = useState<FeatureCollection>();
+  const [selectedFeature, setSelectedFeature] = useState<Feature>();
+
+  // useEffect(() => {
+  //   fetch('/api')
+  //     .then((res) => res.json())
+  //     .then((value) => setText(value.text))
+  //     .catch((reason) => console.log(reason));
+  // }, []);
 
   useEffect(() => {
-    fetch('/api')
+    fetch('/api/features')
       .then((res) => res.json())
-      .then((value) => setText(value.text))
-      .catch((reason) => console.log(reason));
+      .then((value) => {
+        setFeatureCollection(value);
+
+        const feature = value.features[0];
+        if (feature == undefined) return;
+        setSelectedFeature(feature);
+      });
   }, []);
+
+  const onClickSetSelectedFeature = (feature?: Feature) => {
+    if (feature == undefined) return;
+    setSelectedFeature(feature);
+  };
 
   return (
     <>
@@ -28,26 +49,40 @@ export default function Home() {
           <nav className='bg-gray-800 px-2 text-white sm:px-4 lg:px-8'>
             <div className='flex h-20 items-center justify-between'>
               <div className='flex items-center gap-8'>
-                <span className='h-12 w-12 bg-indigo-700'></span>
+                {/* <span className='h-12 w-12 bg-indigo-700'></span> */}
                 <span className='text-3xl font-bold tracking-wider'>IGC Viewer</span>
               </div>
-              <div>Buttons: {text}</div>
+              {/* <div>Buttons: {text}</div> */}
             </div>
           </nav>
         </header>
-        <main className='flex overflow-hidden bg-gray-50'>
-          <div className='scrollbar-hidden flex w-96 flex-shrink-0 flex-col overflow-y-auto bg-gray-700'>
-            <div>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
-                <div key={value} className='flex h-36 items-center justify-center border-b border-gray-800'>
-                  {' '}
-                  <div className='text-white'>{value}</div>
-                </div>
-              ))}
+        <MapProvider>
+          <main className='flex flex-grow overflow-hidden bg-gray-50'>
+            <div className='scrollbar-hidden flex w-96 flex-shrink-0 flex-col overflow-y-auto bg-gray-700'>
+              <div>
+                {featureCollection &&
+                  featureCollection.features.map((feature, i) => (
+                    <button
+                      key={i}
+                      className='flex h-36 w-full items-center justify-center border-b border-gray-800 hover:bg-gray-600'
+                      onClick={() => onClickSetSelectedFeature(feature)}
+                    >
+                      {' '}
+                      <div className='flex flex-col text-left text-white'>
+                        <span className='font-bold'>{feature.properties?.date}</span>{' '}
+                        <span className='font-bold'>{feature.properties?.airport}</span>
+                        <span>
+                          {feature.properties?.pilot} ({feature.properties?.contest_number})
+                        </span>
+                        <span>{feature.properties?.glider}</span>
+                      </div>
+                    </button>
+                  ))}
+              </div>
             </div>
-          </div>
-          <MapViewer />
-        </main>
+            <MapViewer selectedFeature={selectedFeature} />
+          </main>
+        </MapProvider>
       </div>
     </>
   );

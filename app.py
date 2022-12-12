@@ -1,5 +1,6 @@
 from flask import Flask, send_from_directory
 from flask_cors import CORS, cross_origin
+from igc_parser import get_features
 
 app = Flask(__name__, static_folder='client/out', static_url_path='')
 cors = CORS(app)
@@ -9,6 +10,12 @@ cors = CORS(app)
 @cross_origin()
 def api_index():
     return {'text': 'Hello API!'}
+
+
+@app.route('/api/features')
+@cross_origin()
+def api_feature():
+    return get_features()
 
 
 @app.route('/')
