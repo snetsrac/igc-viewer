@@ -61,23 +61,25 @@ export default function Home() {
             <div className='scrollbar-hidden flex w-96 flex-shrink-0 flex-col overflow-y-auto bg-gray-700'>
               <div>
                 {featureCollection &&
-                  featureCollection.features.map((feature, i) => (
-                    <button
-                      key={i}
-                      className='flex h-36 w-full items-center justify-center border-b border-gray-800 hover:bg-gray-600'
-                      onClick={() => onClickSetSelectedFeature(feature)}
-                    >
-                      {' '}
-                      <div className='flex flex-col text-left text-white'>
-                        <span className='font-bold'>{feature.properties?.date}</span>{' '}
-                        <span className='font-bold'>{feature.properties?.airport}</span>
-                        <span>
-                          {feature.properties?.pilot} ({feature.properties?.contest_number})
-                        </span>
-                        <span>{feature.properties?.glider}</span>
-                      </div>
-                    </button>
-                  ))}
+                  featureCollection.features
+                    .sort((a, b) => a.properties?.date - b.properties?.date)
+                    .map((feature, i) => (
+                      <button
+                        key={i}
+                        className='flex h-36 w-full items-center justify-center border-b border-gray-800 hover:bg-gray-600'
+                        onClick={() => onClickSetSelectedFeature(feature)}
+                      >
+                        {' '}
+                        <div className='flex flex-col text-left text-white'>
+                          <span className='font-bold'>{feature.properties?.date}</span>{' '}
+                          <span className='font-bold'>{feature.properties?.airport}</span>
+                          <span>
+                            {feature.properties?.pilot} ({feature.properties?.contest_number})
+                          </span>
+                          <span>{feature.properties?.glider}</span>
+                        </div>
+                      </button>
+                    ))}
               </div>
             </div>
             <MapViewer selectedFeature={selectedFeature} />

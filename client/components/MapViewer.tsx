@@ -25,7 +25,6 @@ export default function MapViewer({ selectedFeature }: MapViewerProps) {
 
   useEffect(() => {
     if (selectedFeature == undefined) return;
-    console.log(getFlyToOptions(selectedFeature));
     igcMap?.flyTo(getFlyToOptions(selectedFeature));
   }, [selectedFeature, igcMap]);
 
