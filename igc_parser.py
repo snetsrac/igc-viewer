@@ -95,5 +95,5 @@ for filepath in glob('data/*.igc'):
     features.append(Feature(geometry=geometry, properties=properties))
 
 
-def get_features() -> FeatureCollection:
-    return FeatureCollection(features=features)
+def get_features() -> list[Feature]:
+    return features

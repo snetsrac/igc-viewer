@@ -1,11 +1,12 @@
 import center from '@turf/center';
-import { Feature, Feature as TurfFeature } from '@turf/helpers';
+import { Feature } from '@turf/helpers';
 import { Feature as GeojsonFeature } from 'geojson';
 import { useEffect } from 'react';
 import Map, { Layer, Source, useMap } from 'react-map-gl';
+import { FlightTrack } from '../api/api';
 
 interface MapViewerProps {
-  selectedFeature?: TurfFeature;
+  selectedFlightTrack: FlightTrack | null;
 }
 
 const getFlyToOptions = (feature: Feature) => {
@@ -20,13 +21,13 @@ const getFlyToOptions = (feature: Feature) => {
   };
 };
 
-export default function MapViewer({ selectedFeature }: MapViewerProps) {
+export default function MapViewer({ selectedFlightTrack }: MapViewerProps) {
   const { igcMap } = useMap();
 
   useEffect(() => {
-    if (selectedFeature == undefined) return;
-    igcMap?.flyTo(getFlyToOptions(selectedFeature));
-  }, [selectedFeature, igcMap]);
+    if (selectedFlightTrack == null) return;
+    igcMap?.flyTo(getFlyToOptions(selectedFlightTrack));
+  }, [selectedFlightTrack, igcMap]);
 
   return (
     <Map
@@ -48,7 +49,7 @@ export default function MapViewer({ selectedFeature }: MapViewerProps) {
         tileSize={512}
         maxzoom={14}
       />
-      <Source id='feature' type='geojson' data={selectedFeature as GeojsonFeature}>
+      <Source id='feature' type='geojson' data={selectedFlightTrack as GeojsonFeature}>
         <Layer
           type='line'
           paint={{
