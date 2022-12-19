@@ -1,7 +1,7 @@
-import { Feature } from '@turf/helpers';
+import { Feature, LineString } from '@turf/helpers';
 import { useEffect, useState } from 'react';
 
-export interface FlightTrack extends Feature {
+export interface FlightTrack extends LineString {
   properties: {
     date: Date;
     pilot: string;
@@ -11,11 +11,11 @@ export interface FlightTrack extends Feature {
   };
 }
 
-export function useFlightTracks(onSetFlightTracks: () => void) {
+export function useFlightTracks() {
   const [flightTracks, setFlightTracks] = useState<FlightTrack[]>([]);
 
   useEffect(() => {
-    fetch('/api/features')
+    fetch('/api/flight-tracks')
       .then<typeof flightTracks>((res) => res.json())
       .then((values) => {
         if (values == undefined) {
@@ -31,8 +31,6 @@ export function useFlightTracks(onSetFlightTracks: () => void) {
             }))
           );
         }
-
-        onSetFlightTracks();
       });
   }, []);
 

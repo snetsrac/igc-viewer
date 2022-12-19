@@ -1,18 +1,20 @@
 import Head from 'next/head';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import MapViewer from '../components/MapViewer';
 import { MapProvider } from 'react-map-gl';
 import Header from '../components/Header';
 import FlightTrackList from '../components/FlightTrackList';
 import { FlightTrack, useFlightTracks } from '../api/api';
+import { NearestPointOnLine } from '@turf/nearest-point-on-line';
 
 export default function Home() {
   const [selectedFlightTrack, setSelectedFlightTrack] = useState<FlightTrack | null>(null);
-  const flightTracks = useFlightTracks(() => {
-    console.log('yello?');
-    console.log(flightTracks);
+  const [nearestPoint, setNearestPoint] = useState<NearestPointOnLine | null>(null);
+  const flightTracks = useFlightTracks();
+
+  useEffect(() => {
     flightTracks.length > 0 ? setSelectedFlightTrack(flightTracks[0]) : setSelectedFlightTrack(null);
-  });
+  }, [flightTracks]);
 
   const onSelectFlightTrack = (flightTrack: FlightTrack) => {
     setSelectedFlightTrack(flightTrack);

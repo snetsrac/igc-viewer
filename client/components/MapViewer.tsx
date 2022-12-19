@@ -1,6 +1,6 @@
 import center from '@turf/center';
-import { Feature } from '@turf/helpers';
-import { Feature as GeojsonFeature } from 'geojson';
+import nearestPointOnLine, { NearestPointOnLine } from '@turf/nearest-point-on-line';
+import { Feature } from 'geojson';
 import { useEffect } from 'react';
 import Map, { Layer, Source, useMap } from 'react-map-gl';
 import { FlightTrack } from '../api/api';
@@ -9,8 +9,8 @@ interface MapViewerProps {
   selectedFlightTrack: FlightTrack | null;
 }
 
-const getFlyToOptions = (feature: Feature) => {
-  const position = center(feature).geometry.coordinates;
+const getFlyToOptions = (flightTrack: FlightTrack) => {
+  const position = center(flightTrack).geometry.coordinates;
 
   return {
     center: {
@@ -33,8 +33,8 @@ export default function MapViewer({ selectedFlightTrack }: MapViewerProps) {
     <Map
       id='igcMap'
       initialViewState={{
-        longitude: -111.888,
-        latitude: 40.01,
+        longitude: -81.848,
+        latitude: 28.384,
         zoom: 9,
       }}
       mapStyle='mapbox://styles/mapbox/satellite-streets-v12'
@@ -49,7 +49,7 @@ export default function MapViewer({ selectedFlightTrack }: MapViewerProps) {
         tileSize={512}
         maxzoom={14}
       />
-      <Source id='feature' type='geojson' data={selectedFlightTrack as GeojsonFeature}>
+      <Source id='selectedFlightTrack' type='geojson' data={selectedFlightTrack as unknown as Feature}>
         <Layer
           type='line'
           paint={{

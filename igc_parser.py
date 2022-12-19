@@ -1,6 +1,6 @@
 from datetime import time as Time, date as Date
 from enum import Enum
-from geojson import Feature, FeatureCollection, LineString
+from geojson import Feature, LineString
 from glob import glob
 
 
@@ -66,21 +66,28 @@ class IgcRecordB:
             ', ' + str(self.gnss_altitude)
 
 
-features: list[Feature] = []
+flight_tracks: list[Feature] = []
+id = 1
 
 for filepath in glob('data/*.igc'):
     b_records: list[IgcRecordB] = []
     properties: dict = {}
 
     with open(filepath, 'r') as file:
+        filename = file.name.split('/')[1]
+        year = int(filename.split('-')[0])
+        month = int(filename.split('-')[1])
+        day = int(filename.split('-')[2])
+        properties['date'] = Date(year, month, day)
+
         for line in file:
             if line[0] == 'B':
                 b_records.append(IgcRecordB(line))
             elif line[0] == 'H':
-                if line[2:5] == 'DTE':
-                    properties['date'] = Date(
-                        int(line[9:11]) + 2000, int(line[7:9]), int(line[5:7])).isoformat()
-                elif line[2:5] == 'PLT':
+                # if line[2:5] == 'DTE':
+                #     properties['date'] = Date(
+                #         int(line[9:11]) + 2000, int(line[7:9]), int(line[5:7])).isoformat()
+                if line[2:5] == 'PLT':
                     properties['pilot'] = line.split(':')[1].rstrip()
                 elif line[2:5] == 'GTY':
                     properties['glider'] = line.split(':')[1].rstrip()
@@ -92,8 +99,16 @@ for filepath in glob('data/*.igc'):
     geometry = LineString(
         [(record.lon, record.lat, record.gnss_altitude) for record in b_records])
 
-    features.append(Feature(geometry=geometry, properties=properties))
+    flight_tracks.append(
+        Feature(geometry=geometry, properties=properties, id=id))
+    id += 1
 
 
-def get_features() -> list[Feature]:
-    return features
+def get_flight_tracks() -> list[Feature]:
+    return sorted(flight_tracks, key=lambda flight_track: flight_track.properties['date'])
+
+
+def get_flight_track_by_id(id: int) -> Feature:
+    for flight_track in flight_tracks:
+        if flight_track.id == id:
+            return flight_track
