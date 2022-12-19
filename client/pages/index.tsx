@@ -9,7 +9,6 @@ import { NearestPointOnLine } from '@turf/nearest-point-on-line';
 
 export default function Home() {
   const [selectedFlightTrack, setSelectedFlightTrack] = useState<FlightTrack | null>(null);
-  const [nearestPoint, setNearestPoint] = useState<NearestPointOnLine | null>(null);
   const flightTracks = useFlightTracks();
 
   useEffect(() => {
@@ -40,7 +39,9 @@ export default function Home() {
             onSelectFlightTrack={onSelectFlightTrack}
           />
           <MapProvider>
-            <MapViewer selectedFlightTrack={selectedFlightTrack} />
+            <MapViewer
+              selectedFlightTrack={selectedFlightTrack}
+            />
           </MapProvider>
         </main>
       </div>

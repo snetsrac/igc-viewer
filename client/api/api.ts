@@ -1,7 +1,9 @@
 import { Feature, LineString } from '@turf/helpers';
 import { useEffect, useState } from 'react';
 
-export interface FlightTrack extends LineString {
+export interface FlightTrack extends Feature {
+  id: number;
+  geometry: LineString;
   properties: {
     date: Date;
     pilot: string;
@@ -9,6 +11,7 @@ export interface FlightTrack extends LineString {
     contest_number: string;
     airport: string;
   };
+  type: 'Feature';
 }
 
 export function useFlightTracks() {
