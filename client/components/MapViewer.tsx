@@ -41,7 +41,7 @@ export default function MapViewer({ selectedFlightTrack }: MapViewerProps) {
     return () => {
       igcMap?.off('mousemove', updateNearestPoint);
     };
-  }, [selectedFlightTrack, igcMap]);
+  }, [selectedFlightTrack, igcMap, updateNearestPoint]);
 
   useEffect(() => {
     if (igcMap?.hasImage('glider')) return;
