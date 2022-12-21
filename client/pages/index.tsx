@@ -4,7 +4,7 @@ import MapViewer from '../components/MapViewer';
 import { MapProvider } from 'react-map-gl';
 import Header from '../components/Header';
 import FlightTrackList from '../components/FlightTrackList';
-import { FlightTrack, useFlightTracks } from '../api/api';
+import { FlightTrack, useFlightTracks } from '../api';
 import { NearestPointOnLine } from '@turf/nearest-point-on-line';
 
 export default function Home() {

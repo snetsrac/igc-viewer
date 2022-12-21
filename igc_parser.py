@@ -1,4 +1,4 @@
-from datetime import time as Time, date as Date
+from datetime import datetime, date, time
 from enum import Enum
 from geojson import Feature, LineString
 from glob import glob
@@ -16,11 +16,11 @@ def parse(line: str, start: int, size: int) -> str:
     return line[start:start + size]
 
 
-def parse_time(s: str) -> Time:
+def parse_time(s: str) -> datetime:
     hours = int(parse(s, 0, 2))
     minutes = int(parse(s, 2, 2))
     seconds = int(parse(s, 4, 2))
-    return Time(hours, minutes, seconds)
+    return datetime(1970, 1, 1, hours, minutes, seconds)
 
 
 def parse_lat(s: str) -> float:
@@ -44,8 +44,8 @@ def parse_fix_validity(s: str) -> FixValidity:
         return FixValidity.V
 
 
-class IgcRecordB:
-    time: Time
+class IgcBRecord:
+    time: datetime
     lat: float
     lon: float
     fix_validity: FixValidity
@@ -70,7 +70,7 @@ flight_tracks: list[Feature] = []
 id = 1
 
 for filepath in glob('data/*.igc'):
-    b_records: list[IgcRecordB] = []
+    b_records: list[IgcBRecord] = []
     properties: dict = {}
 
     with open(filepath, 'r') as file:
@@ -78,11 +78,13 @@ for filepath in glob('data/*.igc'):
         year = int(filename.split('-')[0])
         month = int(filename.split('-')[1])
         day = int(filename.split('-')[2])
-        properties['date'] = Date(year, month, day)
+        properties['date'] = date(year, month, day)
 
         for line in file:
             if line[0] == 'B':
-                b_records.append(IgcRecordB(line))
+                b_record = IgcBRecord(line)
+                b_record.time = b_record.time.replace(year=year, month=month, day=day)
+                b_records.append(b_record)
             elif line[0] == 'H':
                 # if line[2:5] == 'DTE':
                 #     properties['date'] = Date(
@@ -96,11 +98,16 @@ for filepath in glob('data/*.igc'):
             elif line[0] == 'C':
                 properties['airport'] = line[18:].rstrip()
 
+    properties['b_record_times'] = [(record.time.isoformat()) for record in b_records]
+
     geometry = LineString(
-        [(record.lon, record.lat, record.gnss_altitude) for record in b_records])
+        [(record.lon, record.lat, record.gnss_altitude) for record in b_records]
+    )
 
     flight_tracks.append(
-        Feature(geometry=geometry, properties=properties, id=id))
+        Feature(geometry=geometry, properties=properties, id=id)
+    )
+
     id += 1
 
 

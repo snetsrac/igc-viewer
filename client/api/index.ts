@@ -10,6 +10,7 @@ export interface FlightTrack extends Feature {
     glider: string;
     contest_number: string;
     airport: string;
+    b_record_times: Date[];
   };
   type: 'Feature';
 }
@@ -30,6 +31,7 @@ export function useFlightTracks() {
               properties: {
                 ...value.properties,
                 date: new Date(value.properties.date),
+                b_record_times: value.properties.b_record_times.map(timeValue => new Date(timeValue))
               },
             }))
           );

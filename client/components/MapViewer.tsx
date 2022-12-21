@@ -4,7 +4,7 @@ import nearestPointOnLine, { NearestPointOnLine } from '@turf/nearest-point-on-l
 import { Feature } from 'geojson';
 import { useEffect, useState } from 'react';
 import Map, { Layer, Marker, Source, useMap } from 'react-map-gl';
-import { FlightTrack } from '../api/api';
+import { FlightTrack } from '../api';
 
 interface MapViewerProps {
   selectedFlightTrack: FlightTrack | null;

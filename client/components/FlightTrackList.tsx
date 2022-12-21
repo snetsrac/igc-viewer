@@ -1,4 +1,4 @@
-import { FlightTrack } from '../api/api';
+import { FlightTrack } from '../api';
 
 interface FlightTrackListProps {
   flightTracks: FlightTrack[];
