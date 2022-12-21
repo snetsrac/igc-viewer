@@ -5,7 +5,7 @@ import { MapProvider } from 'react-map-gl';
 import Header from '../components/Header';
 import FlightTrackList from '../components/FlightTrackList';
 import { FlightTrack, useFlightTracks } from '../api';
-import { NearestPointOnLine } from '@turf/nearest-point-on-line';
+import AltitudeChart from '../components/AltitudeChart';
 
 export default function Home() {
   const [selectedFlightTrack, setSelectedFlightTrack] = useState<FlightTrack | null>(null);
@@ -38,11 +38,14 @@ export default function Home() {
             selectedFlightTrack={selectedFlightTrack}
             onSelectFlightTrack={onSelectFlightTrack}
           />
-          <MapProvider>
-            <MapViewer
-              selectedFlightTrack={selectedFlightTrack}
-            />
-          </MapProvider>
+          <div className='flex flex-grow flex-col'>
+            <MapProvider>
+              <MapViewer selectedFlightTrack={selectedFlightTrack} />
+            </MapProvider>
+            <div className='max-w-96 h-96' style={{ height: 360 }}>
+              <AltitudeChart selectedFlightTrack={selectedFlightTrack} />
+            </div>
+          </div>
         </main>
       </div>
     </>
