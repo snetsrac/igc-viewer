@@ -1,26 +1,14 @@
+import bbox from '@turf/bbox';
 import bearing from '@turf/bearing';
-import center from '@turf/center';
 import nearestPointOnLine, { NearestPointOnLine } from '@turf/nearest-point-on-line';
 import { Feature } from 'geojson';
 import { useEffect, useState } from 'react';
-import Map, { Layer, Marker, Source, useMap } from 'react-map-gl';
+import Map, { Layer, LngLatBoundsLike, Marker, Source, useMap } from 'react-map-gl';
 import { FlightTrack } from '../api';
 
 interface MapViewerProps {
   selectedFlightTrack: FlightTrack | null;
 }
-
-const getFlyToOptions = (flightTrack: FlightTrack) => {
-  const position = center(flightTrack).geometry.coordinates;
-
-  return {
-    center: {
-      lon: position[0],
-      lat: position[1],
-    },
-    zoom: 9,
-  };
-};
 
 const minUpdateIntervalMs = 0.02 * 1000;
 let time = new Date().getTime();
@@ -46,7 +34,8 @@ export default function MapViewer({ selectedFlightTrack }: MapViewerProps) {
 
   useEffect(() => {
     if (selectedFlightTrack == null) return;
-    igcMap?.flyTo(getFlyToOptions(selectedFlightTrack));
+    const box = bbox(selectedFlightTrack.geometry) as LngLatBoundsLike;
+    igcMap?.fitBounds(box, { padding: 40 });
     igcMap?.on('mousemove', updateNearestPoint);
 
     return () => {
@@ -99,7 +88,7 @@ export default function MapViewer({ selectedFlightTrack }: MapViewerProps) {
           pitchAlignment='map'
           rotation={rotation}
           rotationAlignment='map'
-          style={{ width: '128px' }}
+          style={{ width: '96px' }}
         >
           <img src='/glider_top.png' />
         </Marker>
