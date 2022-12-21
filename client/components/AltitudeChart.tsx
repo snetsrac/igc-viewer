@@ -24,7 +24,12 @@ const options = {
     intersect: false,
   },
   layout: {
-    padding: 18,
+    padding: {
+      top: 24,
+      bottom: 10,
+      left: 10,
+      right: 30,
+    },
   },
   maintainAspectRatio: false,
   plugins: {
@@ -41,22 +46,14 @@ const options = {
           tooltip.innerHTML = '<img src="/glider_side.png" />';
           tooltip.style.pointerEvents = 'none';
           tooltip.style.position = 'absolute';
-          tooltip.style.width = '36px';
+          tooltip.style.width = '48px';
           document.body.appendChild(tooltip);
         }
 
-        // Hide if no tooltip
-        const tooltipModel = context.tooltip;
-        // if (tooltipModel.opacity === 0) {
-        //   tooltip.style.opacity = '0';
-        //   return;
-        // }
-
         // Set display, position, and style
         const position = context.chart.canvas.getBoundingClientRect();
-        console.log(tooltipModel);
-        tooltip.style.left = position.left + tooltipModel.caretX - tooltip.clientWidth / 2 + 'px';
-        tooltip.style.top = position.top + tooltipModel.caretY - tooltip.clientHeight / 2 + 'px';
+        tooltip.style.left = position.left + context.tooltip.caretX - tooltip.clientWidth / 2 + 'px';
+        tooltip.style.top = position.top + context.tooltip.caretY - tooltip.clientHeight / 2 + 'px';
         tooltip.style.opacity = '1';
       },
     },
