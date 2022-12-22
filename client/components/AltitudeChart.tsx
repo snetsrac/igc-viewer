@@ -1,19 +1,55 @@
 import { Chart, LinearScale, TimeScale, PointElement, LineElement, Tooltip, ChartData, ChartOptions } from 'chart.js';
 import 'chartjs-adapter-date-fns';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { FlightTrack } from '../api';
 
 interface AltitudeChartProps {
   selectedFlightTrack: FlightTrack | null;
-  trackSegmentIndex: number;
-  onUpdateTooltip: (trackSegmentIndex: number) => void;
+  mapSegmentIndex: number;
+  onUpdateTooltip: (index: number) => void;
 }
 
 Chart.register(LinearScale, TimeScale, PointElement, LineElement, Tooltip);
 
-const options = (onUpdateTooltip: (trackSegmentIndex: number) => void) => {
-  return {
+export default function AltitudeChart({ selectedFlightTrack, mapSegmentIndex, onUpdateTooltip }: AltitudeChartProps) {
+  const [isSelfUpdate, setIsSelfUpdate] = useState(false);
+  const ref = useRef<Chart>();
+  const chart = ref.current;
+
+  useEffect(() => {
+    if (isSelfUpdate) {
+      setIsSelfUpdate(false);
+    }
+
+    if (chart && chart.tooltip) {
+      chart.tooltip.setActiveElements(
+        [
+          {
+            datasetIndex: 0,
+            index: mapSegmentIndex,
+          },
+        ],
+        { x: 0, y: 0 }
+      );
+    }
+  }, [mapSegmentIndex]);
+
+  if (selectedFlightTrack == null) return <></>;
+
+  const data = {
+    datasets: [
+      {
+        data: selectedFlightTrack.geometry.coordinates.map((position) => position[2]),
+        borderColor: 'rgb(255, 0, 0)',
+        borderWidth: 3,
+        backgroundColor: 'rgb(255, 0, 0, 1)',
+      },
+    ],
+    labels: selectedFlightTrack.properties.b_record_times,
+  };
+
+  const options = {
     animation: false,
     elements: {
       line: {
@@ -22,6 +58,11 @@ const options = (onUpdateTooltip: (trackSegmentIndex: number) => void) => {
       point: {
         pointStyle: false,
       },
+    },
+    onHover: (event) => {
+      if (event.type === 'mousemove' && !isSelfUpdate) {
+        setIsSelfUpdate(true);
+      }
     },
     interaction: {
       mode: 'x',
@@ -41,7 +82,9 @@ const options = (onUpdateTooltip: (trackSegmentIndex: number) => void) => {
         enabled: false,
         external: (context) => {
           // Update track segment
-          onUpdateTooltip(context.tooltip.dataPoints[0].dataIndex);
+          if (isSelfUpdate) {
+            onUpdateTooltip(context.tooltip.dataPoints[0].dataIndex);
+          }
 
           // Tooltip element
           let tooltip = document.getElementById('chartjs-tooltip');
@@ -88,44 +131,6 @@ const options = (onUpdateTooltip: (trackSegmentIndex: number) => void) => {
       },
     },
   } as ChartOptions<'line'>;
-};
 
-const transformData = (flightTrack: FlightTrack): ChartData<'line'> => {
-  return {
-    datasets: [
-      {
-        data: flightTrack.geometry.coordinates.map((position) => position[2]),
-        borderColor: 'rgb(255, 0, 0)',
-        borderWidth: 3,
-        backgroundColor: 'rgb(255, 0, 0, 1)',
-      },
-    ],
-    labels: flightTrack.properties.b_record_times,
-  };
-};
-
-export default function AltitudeChart({ selectedFlightTrack, trackSegmentIndex, onUpdateTooltip }: AltitudeChartProps) {
-  const ref = useRef<Chart>();
-
-  useEffect(() => {
-    const chart = ref.current;
-
-    if (chart && chart.tooltip) {
-      chart.tooltip.setActiveElements(
-        [
-          {
-            datasetIndex: 0,
-            index: trackSegmentIndex,
-          },
-        ],
-        { x: 0, y: 0 }
-      );
-    }
-  }, [trackSegmentIndex]);
-
-  if (selectedFlightTrack == null) return <></>;
-
-  const data = transformData(selectedFlightTrack);
-
-  return <Line ref={ref} data={data} options={options(onUpdateTooltip)} height={1} width={1} />;
+  return <Line ref={ref} data={data} options={options} height={1} width={1} />;
 }

@@ -9,14 +9,14 @@ import { FlightTrack } from '../api';
 
 interface MapViewerProps {
   selectedFlightTrack: FlightTrack | null;
-  trackSegmentIndex: number;
+  chartSegmentIndex: number;
   onUpdateNearestPoint: (trackSegmentIndex: number) => void;
 }
 
 const minUpdateIntervalMs = 0.02 * 1000;
 let time = new Date().getTime();
 
-export default function MapViewer({ selectedFlightTrack, trackSegmentIndex, onUpdateNearestPoint }: MapViewerProps) {
+export default function MapViewer({ selectedFlightTrack, chartSegmentIndex, onUpdateNearestPoint }: MapViewerProps) {
   const [nearestPoint, setNearestPoint] = useState<NearestPointOnLine | Feature<Point> | null>(null);
   const [rotation, setRotation] = useState<number>(0);
   const { igcMap } = useMap();
@@ -56,16 +56,16 @@ export default function MapViewer({ selectedFlightTrack, trackSegmentIndex, onUp
   useEffect(() => {
     if (selectedFlightTrack == null) return;
 
-    if (trackSegmentIndex === selectedFlightTrack.geometry.coordinates.length - 1) {
-      trackSegmentIndex--;
+    if (chartSegmentIndex === selectedFlightTrack.geometry.coordinates.length - 1) {
+      chartSegmentIndex--;
     }
 
-    const start = selectedFlightTrack.geometry.coordinates[trackSegmentIndex];
-    const end = selectedFlightTrack.geometry.coordinates[trackSegmentIndex + 1];
+    const start = selectedFlightTrack.geometry.coordinates[chartSegmentIndex];
+    const end = selectedFlightTrack.geometry.coordinates[chartSegmentIndex + 1];
     setRotation(bearing(start, end));
 
     setNearestPoint({ geometry: { coordinates: [start[0], start[1]], type: 'Point' } } as Feature<Point>);
-  }, [trackSegmentIndex]);
+  }, [chartSegmentIndex]);
 
   // Load glider map marker image
   useEffect(() => {

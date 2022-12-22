@@ -11,7 +11,8 @@ import { TrackSegmentData, updateTrackSegmentData } from '../hooks/trackSegmentD
 export default function Home() {
   const flightTracks = useFlightTracks();
   const [selectedFlightTrack, setSelectedFlightTrack] = useState<FlightTrack | null>(null);
-  const [trackSegmentIndex, setTrackSegmentIndex] = useState(0);
+  const [mapSegmentIndex, setMapSegmentIndex] = useState(0);
+  const [chartSegmentIndex, setChartSegmentIndex] = useState(0);
   const [trackSegmentData] = useState<TrackSegmentData>({
     time: new Date(),
     distanceKm: 0,
@@ -29,8 +30,12 @@ export default function Home() {
   }, [flightTracks]);
 
   useEffect(() => {
-    updateTrackSegmentData(trackSegmentData, selectedFlightTrack, trackSegmentIndex);
-  }, [selectedFlightTrack, trackSegmentIndex]);
+    updateTrackSegmentData(trackSegmentData, selectedFlightTrack, mapSegmentIndex);
+  }, [selectedFlightTrack, mapSegmentIndex]);
+
+  useEffect(() => {
+    updateTrackSegmentData(trackSegmentData, selectedFlightTrack, chartSegmentIndex);
+  }, [selectedFlightTrack, chartSegmentIndex]);
 
   const onSelectFlightTrack = (flightTrack: FlightTrack) => {
     setSelectedFlightTrack(flightTrack);
@@ -59,15 +64,15 @@ export default function Home() {
             <MapProvider>
               <MapViewer
                 selectedFlightTrack={selectedFlightTrack}
-                trackSegmentIndex={trackSegmentIndex}
-                onUpdateNearestPoint={(trackSegmentIndex) => setTrackSegmentIndex(trackSegmentIndex)}
+                chartSegmentIndex={chartSegmentIndex}
+                onUpdateNearestPoint={(index) => setMapSegmentIndex(index)}
               />
             </MapProvider>
             <div className='max-w-96 h-96' style={{ height: 360 }}>
               <AltitudeChart
                 selectedFlightTrack={selectedFlightTrack}
-                trackSegmentIndex={trackSegmentIndex}
-                onUpdateTooltip={(trackSegmentIndex) => setTrackSegmentIndex(trackSegmentIndex)}
+                mapSegmentIndex={mapSegmentIndex}
+                onUpdateTooltip={(index) => setChartSegmentIndex(index)}
               />
             </div>
           </div>
