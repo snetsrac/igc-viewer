@@ -9,6 +9,7 @@ import AltitudeChart from '../components/AltitudeChart';
 
 export default function Home() {
   const [selectedFlightTrack, setSelectedFlightTrack] = useState<FlightTrack | null>(null);
+  const [trackSegmentIndex, setTrackSegmentIndex] = useState(0);
   const flightTracks = useFlightTracks();
 
   useEffect(() => {
@@ -40,10 +41,18 @@ export default function Home() {
           />
           <div className='flex flex-grow flex-col'>
             <MapProvider>
-              <MapViewer selectedFlightTrack={selectedFlightTrack} />
+              <MapViewer
+                selectedFlightTrack={selectedFlightTrack}
+                trackSegmentIndex={trackSegmentIndex}
+                onUpdateNearestPoint={(trackSegmentIndex) => setTrackSegmentIndex(trackSegmentIndex)}
+              />
             </MapProvider>
             <div className='max-w-96 h-96' style={{ height: 360 }}>
-              <AltitudeChart selectedFlightTrack={selectedFlightTrack} />
+              <AltitudeChart
+                selectedFlightTrack={selectedFlightTrack}
+                trackSegmentIndex={trackSegmentIndex}
+                onUpdateTooltip={(trackSegmentIndex) => setTrackSegmentIndex(trackSegmentIndex)}
+              />
             </div>
           </div>
         </main>
