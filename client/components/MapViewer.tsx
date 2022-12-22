@@ -32,17 +32,23 @@ export default function MapViewer({ selectedFlightTrack }: MapViewerProps) {
     }
   };
 
+  // Pan and zoom view when a new flight track is selected
   useEffect(() => {
     if (selectedFlightTrack == null) return;
     const box = bbox(selectedFlightTrack.geometry) as LngLatBoundsLike;
     igcMap?.fitBounds(box, { padding: 40 });
+  }, [selectedFlightTrack, igcMap]);
+
+  // Update glider map marker position
+  useEffect(() => {
     igcMap?.on('mousemove', updateNearestPoint);
 
     return () => {
       igcMap?.off('mousemove', updateNearestPoint);
     };
-  }, [selectedFlightTrack, igcMap, updateNearestPoint]);
+  }, [igcMap, updateNearestPoint]);
 
+  // Load glider map marker image
   useEffect(() => {
     if (igcMap?.hasImage('glider')) return;
 
