@@ -12,7 +12,7 @@ interface AltitudeChartProps {
 
 Chart.register(LinearScale, TimeScale, PointElement, LineElement, Tooltip);
 
-const options = (trackSegmentIndex: number, onUpdateTooltip: (trackSegmentIndex: number) => void) => {
+const options = (onUpdateTooltip: (trackSegmentIndex: number) => void) => {
   return {
     animation: false,
     elements: {
@@ -68,6 +68,7 @@ const options = (trackSegmentIndex: number, onUpdateTooltip: (trackSegmentIndex:
     scales: {
       x: {
         type: 'time',
+        ticks: { stepSize: 5 },
         time: {
           displayFormats: {
             minute: 'HH:mm',
@@ -126,5 +127,5 @@ export default function AltitudeChart({ selectedFlightTrack, trackSegmentIndex, 
 
   const data = transformData(selectedFlightTrack);
 
-  return <Line ref={ref} data={data} options={options(trackSegmentIndex, onUpdateTooltip)} height={1} width={1} />;
+  return <Line ref={ref} data={data} options={options(onUpdateTooltip)} height={1} width={1} />;
 }

@@ -56,7 +56,7 @@ export default function MapViewer({ selectedFlightTrack, trackSegmentIndex, onUp
   useEffect(() => {
     if (selectedFlightTrack == null) return;
 
-    if (trackSegmentIndex === selectedFlightTrack.geometry.coordinates.length) {
+    if (trackSegmentIndex === selectedFlightTrack.geometry.coordinates.length - 1) {
       trackSegmentIndex--;
     }
 

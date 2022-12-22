@@ -6,15 +6,31 @@ import Header from '../components/Header';
 import FlightTrackList from '../components/FlightTrackList';
 import { FlightTrack, useFlightTracks } from '../api';
 import AltitudeChart from '../components/AltitudeChart';
+import { TrackSegmentData, updateTrackSegmentData } from '../hooks/trackSegmentData';
 
 export default function Home() {
+  const flightTracks = useFlightTracks();
   const [selectedFlightTrack, setSelectedFlightTrack] = useState<FlightTrack | null>(null);
   const [trackSegmentIndex, setTrackSegmentIndex] = useState(0);
-  const flightTracks = useFlightTracks();
+  const [trackSegmentData] = useState<TrackSegmentData>({
+    time: new Date(),
+    distanceKm: 0,
+    airspeedKph: 0,
+    altitudeM: 0,
+    heading: 0,
+  });
 
   useEffect(() => {
-    flightTracks.length > 0 ? setSelectedFlightTrack(flightTracks[0]) : setSelectedFlightTrack(null);
+    if (flightTracks.length > 0) {
+      setSelectedFlightTrack(flightTracks[0]);
+    } else {
+      setSelectedFlightTrack(null);
+    }
   }, [flightTracks]);
+
+  useEffect(() => {
+    updateTrackSegmentData(trackSegmentData, selectedFlightTrack, trackSegmentIndex);
+  }, [selectedFlightTrack, trackSegmentIndex]);
 
   const onSelectFlightTrack = (flightTrack: FlightTrack) => {
     setSelectedFlightTrack(flightTrack);
@@ -32,7 +48,7 @@ export default function Home() {
       </Head>
 
       <div className='flex h-screen flex-col'>
-        <Header />
+        <Header data={selectedFlightTrack && trackSegmentData} />
         <main className='flex flex-grow overflow-hidden bg-gray-50'>
           <FlightTrackList
             flightTracks={flightTracks}
